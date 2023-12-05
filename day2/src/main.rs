@@ -16,7 +16,7 @@ struct Result {
 }
 
 impl Game {
-    fn is_possible(&self, r_pos: i32, g_pos: i32, b_pos: i32) -> bool {
+    fn is_possible(&self, r_pos: i32, g_pos: i32, b_pos: i32) -> (bool, i32, i32, i32) {
         let mut r_max = 0;
         let mut g_max = 0;
         let mut b_max = 0;
@@ -43,7 +43,12 @@ impl Game {
 
         // println!("R: {:#?}",results);
         // println!("R,G,Bmax: {},{},{}",r_max,g_max,b_max);
-        r_max <= r_pos && g_max <= g_pos && b_max <= b_pos
+        (
+            r_max <= r_pos && g_max <= g_pos && b_max <= b_pos,
+            r_max,
+            g_max,
+            b_max,
+        )
     }
 }
 
@@ -52,10 +57,10 @@ fn test() {
         .parse::<Game>()
         .unwrap();
 
-    debug_assert!(g1.clone().is_possible(4, 2, 6) == true);
-    debug_assert!(g1.clone().is_possible(2, 2, 6) == false);
-    debug_assert!(g1.clone().is_possible(4, 1, 6) == false);
-    debug_assert!(g1.clone().is_possible(4, 2, 5) == false);
+    debug_assert!(g1.clone().is_possible(4, 2, 6) == (true, 4, 2, 6));
+    debug_assert!(g1.clone().is_possible(2, 2, 6) == (false, 4, 2, 6));
+    debug_assert!(g1.clone().is_possible(4, 1, 6) == (false, 4, 2, 6));
+    debug_assert!(g1.clone().is_possible(4, 2, 5) == (false, 4, 2, 6));
 
     debug_assert!(g1.id == 1);
     debug_assert!(g1.results == "3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
@@ -72,7 +77,7 @@ fn test() {
             std::fs::read_to_string("input_sample.txt")
                 .unwrap()
                 .as_str()
-        ) == 888
+        ) == 2286
     );
 }
 
@@ -85,11 +90,23 @@ fn part1(data: &str) -> i32 {
 
     games
         .iter()
-        .map(|g| if g.is_possible(12, 13, 14) { g.id } else { 0 })
+        .map(|g| if g.is_possible(12, 13, 14).0 { g.id } else { 0 })
         .sum()
 }
-fn part2(data: &str) -> usize {
-    888
+fn part2(data: &str) -> i32 {
+    let games: Vec<Game> = data
+        .split('\n')
+        .filter(|y| !y.is_empty())
+        .map(|x| x.parse::<Game>().unwrap())
+        .collect();
+
+    games
+        .iter()
+        .map(|g| {
+            let x = g.is_possible(12, 13, 14);
+            x.1 * x.2 * x.3
+        })
+        .sum()
 }
 
 fn main() {
@@ -100,6 +117,6 @@ fn main() {
     assert!(p1 == 2237);
     let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
     println!("Part2: {}", p2);
-    assert!(p2 == 888);
+    assert!(p2 == 66681);
     println!("Completed in {} us", now.elapsed().as_micros());
 }
