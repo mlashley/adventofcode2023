@@ -105,8 +105,37 @@ fn is_partnumber(map: &HashMap<(i64, i64), Thing>, x: i64, y: i64) -> bool {
     false
 }
 
-fn merge_map(map: &mut HashMap<(i64, i64), Thing>) {
+fn is_gearnumber(map: &HashMap<(i64, i64), Thing>, x: i64, y: i64) -> Option<(i64, i64)> {
+    let num_len = map
+        .get(&(x, y))
+        .unwrap()
+        .value
+        .unwrap()
+        .checked_ilog10()
+        .unwrap_or(0)
+        + 1;
+    let xmin = x - (i64::from(num_len));
 
+    for xx in xmin..x + 2 {
+        for yy in y - 1..y + 2 {
+            let e = map.get(&(xx, yy));
+            match e
+                .unwrap_or_else(|| &Thing {
+                    value: Some(99),
+                    symbol: '.',
+                    is_partnumber: false,
+                })
+                .symbol
+            {
+                '*' => return Some((xx, yy)),
+                _ => {}
+            }
+        }
+    }
+    None
+}
+
+fn merge_map(map: &mut HashMap<(i64, i64), Thing>) {
     let xmax = *map.keys().map(|(x, _)| x).max().unwrap();
     let xmin = *map.keys().map(|(x, _)| x).min().unwrap();
     let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
@@ -132,7 +161,6 @@ fn merge_map(map: &mut HashMap<(i64, i64), Thing>) {
             }
         }
     }
-
 }
 
 // I have no fucking clue why this is a HashMap and not a straight Vec<Vec<>>...
@@ -182,12 +210,58 @@ fn part1(data: &str) -> u32 {
         }
     }
 
-    println!("Total: {}", total);
-
     total
 }
 fn part2(data: &str) -> u32 {
-    888
+    let mut map: HashMap<(i64, i64), Thing> = HashMap::new();
+    let mut gear_map: HashMap<(i64, i64), u32> = HashMap::new();
+    data.split('\n')
+        .enumerate()
+        .map(|(y, s)| {
+            for (x, c) in s.chars().enumerate() {
+                if c != '.' {
+                    map.insert((x as i64, y as i64), Thing::new(c));
+                }
+            }
+        })
+        .for_each(drop);
+
+    // print_map(&map);
+
+    merge_map(&mut map);
+    // print_map_val(&map);
+
+    let xmax = *map.keys().map(|(x, _)| x).max().unwrap();
+    let xmin = *map.keys().map(|(x, _)| x).min().unwrap();
+    let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
+    let ymin = *map.keys().map(|(_, y)| y).min().unwrap();
+    let mut total: u32 = 0;
+    let mut cur_val: u32 = 0;
+
+    for y in ymin..=ymax {
+        for x in xmin..=xmax {
+            if map.contains_key(&(x, y)) {
+                let thing_value = map.get(&(x, y)).unwrap().value;
+                if thing_value != None {
+                    let gear = is_gearnumber(&map, x, y);
+                    if gear != None {
+                        // println!(
+                        //     "{:?} is gear number {}",
+                        //     gear.unwrap(),
+                        //     map.get(&(x, y)).unwrap().value.unwrap()
+                        // );
+                        if gear_map.contains_key(&gear.unwrap()) {
+                            total += thing_value.unwrap() * gear_map.get(&gear.unwrap()).unwrap();
+                        } else {
+                            gear_map.insert(gear.unwrap(), thing_value.unwrap());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    total
 }
 
 fn main() {
@@ -198,6 +272,6 @@ fn main() {
     assert!(p1 == 525911);
     let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
     println!("Part2: {}", p2);
-    assert!(p2 == 888);
+    assert!(p2 == 75805607);
     println!("Completed in {} us", now.elapsed().as_micros());
 }
