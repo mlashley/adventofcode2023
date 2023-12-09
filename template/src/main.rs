@@ -4,7 +4,7 @@
 use std::time::Instant;
 use std::env;
 use log::{debug, error, info, log_enabled, warn, Level};
-
+use parse_display::{Display, FromStr};
 
 fn test() {
     debug_assert!(

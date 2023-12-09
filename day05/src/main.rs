@@ -1,4 +1,4 @@
-use log::{debug, error, info, log_enabled, warn, Level};
+use log::{debug, info};
 use parse_display::{Display, FromStr};
 use std::collections::VecDeque;
 use std::env;
@@ -58,7 +58,7 @@ fn part1(data: &str) -> u64 {
         .collect();
     debug!("SEEDS: {:?}", seeds);
 
-    while chunks.len() > 0 {
+    while !chunks.is_empty() {
         let mut lines: VecDeque<_> = chunks
             .pop_front()
             .expect("Bad Chunk?")
@@ -103,7 +103,7 @@ fn part2(data: &str) -> u64 {
         .parse::<Seeds>()
         .unwrap();
 
-    let mut seedy: Vec<_> = seed_obj
+    let seedy: Vec<_> = seed_obj
         .seeds
         .split(' ')
         .map(|s| s.parse::<u64>().unwrap())
@@ -118,7 +118,7 @@ fn part2(data: &str) -> u64 {
         debug!("{:?}", pair);
     }
 
-    while chunks.len() > 0 {
+    while !chunks.is_empty() {
         let mut lines: VecDeque<_> = chunks
             .pop_front()
             .expect("Bad Chunk?")
