@@ -21,9 +21,8 @@ impl Game {
         let mut g_max = 0;
         let mut b_max = 0;
 
-        let results = self
-            .results
-            .split(';')
+        self
+            .results .split(';')
             .map(|res| {
                 res.trim()
                     .split(',')
@@ -39,7 +38,7 @@ impl Game {
                     })
                     .collect::<Vec<Result>>()
             })
-            .collect::<Vec<_>>();
+            .for_each(drop);
 
         // println!("R: {:#?}",results);
         // println!("R,G,Bmax: {},{},{}",r_max,g_max,b_max);

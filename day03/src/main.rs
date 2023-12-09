@@ -98,7 +98,7 @@ fn is_partnumber(map: &HashMap<(i64, i64), Thing>, x: i64, y: i64) -> bool {
                 .value
             {
                 None => return true,
-                Some(x) => {}
+                Some(_x) => {}
             }
         }
     }
@@ -189,8 +189,7 @@ fn part1(data: &str) -> u32 {
     let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
     let ymin = *map.keys().map(|(_, y)| y).min().unwrap();
     let mut total: u32 = 0;
-    let mut cur_val: u32 = 0;
-
+    
     for y in ymin..=ymax {
         for x in xmin..=xmax {
             if map.contains_key(&(x, y)) {
@@ -236,7 +235,6 @@ fn part2(data: &str) -> u32 {
     let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
     let ymin = *map.keys().map(|(_, y)| y).min().unwrap();
     let mut total: u32 = 0;
-    let mut cur_val: u32 = 0;
 
     for y in ymin..=ymax {
         for x in xmin..=xmax {
