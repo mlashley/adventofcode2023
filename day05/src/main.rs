@@ -168,6 +168,6 @@ fn main() {
     assert!(p1 == 1181555926);
     let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
     info!("Part2: {}", p2);
-    assert!(p2 == 888);
+    assert!(p2 == 37806486);
     debug!("Completed in {} us", now.elapsed().as_micros());
 }
