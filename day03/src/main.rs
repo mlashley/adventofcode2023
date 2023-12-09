@@ -105,31 +105,12 @@ fn is_partnumber(map: &HashMap<(i64, i64), Thing>, x: i64, y: i64) -> bool {
     false
 }
 
-// I have no fucking clue why this is a HashMap and not a straight Vec<Vec<>>...
-// I guess I am expecting a part-2 twist.
-
-fn part1(data: &str) -> u32 {
-    let mut map: HashMap<(i64, i64), Thing> = HashMap::new();
-    data.split('\n')
-        .enumerate()
-        .map(|(y, s)| {
-            for (x, c) in s.chars().enumerate() {
-                if c != '.' {
-                    map.insert((x as i64, y as i64), Thing::new(c));
-                }
-            }
-        })
-        .for_each(drop);
-
-    // print_map(&map);
+fn merge_map(map: &mut HashMap<(i64, i64), Thing>) {
 
     let xmax = *map.keys().map(|(x, _)| x).max().unwrap();
     let xmin = *map.keys().map(|(x, _)| x).min().unwrap();
     let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
     let ymin = *map.keys().map(|(_, y)| y).min().unwrap();
-    let mut total: u32 = 0;
-    let mut cur_val: u32 = 0;
-
     // Merge the numbers.
     for y in ymin..=ymax {
         for x in xmin..=xmax {
@@ -151,7 +132,36 @@ fn part1(data: &str) -> u32 {
             }
         }
     }
+
+}
+
+// I have no fucking clue why this is a HashMap and not a straight Vec<Vec<>>...
+// I guess I am expecting a part-2 twist.
+
+fn part1(data: &str) -> u32 {
+    let mut map: HashMap<(i64, i64), Thing> = HashMap::new();
+    data.split('\n')
+        .enumerate()
+        .map(|(y, s)| {
+            for (x, c) in s.chars().enumerate() {
+                if c != '.' {
+                    map.insert((x as i64, y as i64), Thing::new(c));
+                }
+            }
+        })
+        .for_each(drop);
+
+    // print_map(&map);
+
+    merge_map(&mut map);
     // print_map_val(&map);
+
+    let xmax = *map.keys().map(|(x, _)| x).max().unwrap();
+    let xmin = *map.keys().map(|(x, _)| x).min().unwrap();
+    let ymax = *map.keys().map(|(_, y)| y).max().unwrap();
+    let ymin = *map.keys().map(|(_, y)| y).min().unwrap();
+    let mut total: u32 = 0;
+    let mut cur_val: u32 = 0;
 
     for y in ymin..=ymax {
         for x in xmin..=xmax {
@@ -185,7 +195,7 @@ fn main() {
     let now = Instant::now();
     let p1 = part1(std::fs::read_to_string("input.txt").unwrap().as_str());
     println!("Part1: {}", p1);
-    assert!(p1 == 999);
+    assert!(p1 == 525911);
     let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
     println!("Part2: {}", p2);
     assert!(p2 == 888);
