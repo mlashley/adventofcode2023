@@ -1,11 +1,11 @@
-use log::{debug, error, info, log_enabled, warn, Level};
+use log::{debug, info};
 use parse_display::{Display, FromStr};
 use std::env;
 use std::time::Instant;
 
 #[derive(Display, FromStr, Debug, Clone)]
 #[display(r"Time: {times}")]
-struct TImes {
+struct Times {
     times: String,
 }
 
@@ -28,13 +28,13 @@ fn test() {
             std::fs::read_to_string("input_sample.txt")
                 .unwrap()
                 .as_str()
-        ) == 888
+        ) == 71503
     );
 }
 
 fn part1(data: &str) -> usize {
     let lines: Vec<_> = data.split('\n').filter(|y| !y.is_empty()).collect();
-    let timething = lines[0].parse::<TImes>().unwrap();
+    let timething = lines[0].parse::<Times>().unwrap();
     let distancething = lines[1].parse::<Distances>().unwrap();
     let times: Vec<_> = timething
         .times
@@ -58,6 +58,7 @@ fn part1(data: &str) -> usize {
             debug!("H: {} D: {}", hold, my_distance);
             if my_distance > distances[i] {
                 winning_this += 1;
+                debug!("WINNER WINNER CHICKEN DINNER");
             }
         }
         winning_multipler *= winning_this;
@@ -65,8 +66,44 @@ fn part1(data: &str) -> usize {
 
     winning_multipler
 }
-fn part2(data: &str) -> usize {
-    888
+fn part2(data: &str) -> u64 {
+    let lines: Vec<_> = data.split('\n').filter(|y| !y.is_empty()).collect();
+    let timething = lines[0].parse::<Times>().unwrap();
+    let distancething = lines[1].parse::<Distances>().unwrap();
+    let time = timething.times.replace(' ', "").parse::<u64>().unwrap();
+
+    let distance = distancething
+        .distances
+        .replace(' ', "")
+        .parse::<u64>()
+        .unwrap();
+
+    debug!("T: {:?} D: {:?}", time, distance);
+
+    // This should probably pick a mid-point and iterate (by halves a la git-bisect, or Newton-Raphson) to find the zero-crossing in O(logN), rather than O(N),
+    // but I'm not doing a coding interview and still catching up from vacation, and anyway optimizing down 15ms runtime here is pointless optimization.
+    let mut winning_start = 0;
+    for hold in 1..time {
+        let my_distance = (time - hold) * hold;
+        debug!("H: {} D: {}", hold, my_distance);
+        if my_distance > distance {
+            winning_start = hold;
+            info!("start: {}", winning_start);
+            break;
+        }
+    }
+
+    let mut winning_end = 0;
+    for hold in (1..time).rev() {
+        let my_distance = (time - hold) * hold;
+        debug!("H: {} D: {}", hold, my_distance);
+        if my_distance > distance {
+            winning_end = hold;
+            info!("end: {}", winning_end);
+            break;
+        }
+    }
+    1 + winning_end - winning_start
 }
 
 fn main() {
@@ -81,6 +118,6 @@ fn main() {
     assert!(p1 == 131376);
     let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
     info!("Part2: {}", p2);
-    assert!(p2 == 888);
+    assert!(p2 == 34123437);
     info!("Completed in {} us", now.elapsed().as_micros());
 }
