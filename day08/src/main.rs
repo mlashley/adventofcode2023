@@ -92,7 +92,6 @@ fn part2(data: &str) -> u64 {
     debug!("CURR MAP: {:?}", curr_vec);
 
     // Walk it
-        
     let mut count = 0;
     let mut last_seen = vec![0; curr_vec.len()];
     let mut periods = vec![0; curr_vec.len()];
@@ -110,11 +109,10 @@ fn part2(data: &str) -> u64 {
                 if periods[i] == 0 && last_seen[i] == 0 {
                     last_seen[i] = count;
                 } else if periods[i] == 0 {                                 
-                    debug!("[{}] {}",i,count-last_seen[i]);
                     periods[i] = count-last_seen[i];
-                    last_seen[i] = count;
+                    debug!("[{}] {}",i,periods[i]);
                 }
-                if periods.clone().into_iter().filter(|x|*x==0).count() == 0 {
+                if !periods.contains(&0) { // Gotta catch 'em all...
                     break;
                 }
             }
@@ -130,7 +128,7 @@ fn part2(data: &str) -> u64 {
         debug!("CURR MAP: {:?}", curr_vec);
         }
     }
-    // We recall this from another year - find the periods of each one, and then take the product of their lcm's
+    // We recall this from another year - find the periods of each cycle, and then take the product of their lcm's to find alignment.
     let mut lcm_result:u64 = periods[0];
     for p in periods {
         lcm_result = p.lcm(&lcm_result);
