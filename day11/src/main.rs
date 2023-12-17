@@ -9,20 +9,31 @@ fn test() {
             std::fs::read_to_string("input_sample.txt")
                 .unwrap()
                 .as_str()
+            ,1 
         ) == 374
     );
     debug_assert!(
-        part2(
+        part1(
             std::fs::read_to_string("input_sample.txt")
                 .unwrap()
                 .as_str()
-        ) == 888
+            ,10-1    
+        ) == 1030
+    );
+    debug_assert!(
+        part1(
+            std::fs::read_to_string("input_sample.txt")
+                .unwrap()
+                .as_str()
+            ,100-1
+        ) == 8410
     );
 }
 
 fn print_universe(galaxies: &HashSet<(usize, usize)>) {
 
     let x_max = galaxies.iter().map(|g| g.0).max().unwrap() + 1;
+    if x_max > 4000 { debug!("You are insane - refusing to print giant map, your 40inch widescreen is not /that/ huge") ; return }
     let y_max = galaxies.iter().map(|g| g.1).max().unwrap() + 1 ;
     let mut s = String::new();
     for y in 0..y_max {
@@ -55,7 +66,7 @@ fn expand_universe(galaxies:  &mut HashSet<(usize, usize)>,universe: Vec<Vec<cha
                     new_galaxies.insert((galaxy.0,galaxy.1+time));
                 }
             }
-            added += 1;
+            added += time;
         }
         
     }
@@ -76,7 +87,7 @@ fn expand_universe(galaxies:  &mut HashSet<(usize, usize)>,universe: Vec<Vec<cha
                     new_galaxies.insert((galaxy.0+time,galaxy.1));
                 }
             }
-            added += 1;
+            added += time;
             let mut v = Vec::from_iter(new_galaxies.clone()); v.sort();
             debug!("newer_galaxies: {:?}",v);
         }
@@ -112,7 +123,7 @@ fn sum_of_shortest_paths(galaxies: HashSet<(usize, usize)>) -> i64 {
     total_length
 }
 
-fn part1(data: &str) -> i64 {
+fn part1(data: &str,time: usize) -> i64 {
 
 
     let universe: Vec<_> = data
@@ -139,7 +150,7 @@ fn part1(data: &str) -> i64 {
 
     debug!("{:?}",galaxies);
 
-    expand_universe(&mut galaxies,universe,1);
+    expand_universe(&mut galaxies,universe,time);
 
     debug!("{:?}",galaxies);
 
@@ -160,11 +171,11 @@ fn main() {
     env_logger::init();
     test();
     let now = Instant::now();
-    let p1 = part1(std::fs::read_to_string("input.txt").unwrap().as_str());
+    let p1 = part1(std::fs::read_to_string("input.txt").unwrap().as_str(),1);
     info!("Part1: {}", p1);
     assert!(p1 == 10292708);
-    let p2 = part2(std::fs::read_to_string("input.txt").unwrap().as_str());
+    let p2 = part1(std::fs::read_to_string("input.txt").unwrap().as_str(),1000000-1);
     info!("Part2: {}", p2);
-    assert!(p2 == 888);
+    assert!(p2 == 790194712336);
     info!("Completed in {} us", now.elapsed().as_micros());
 }
