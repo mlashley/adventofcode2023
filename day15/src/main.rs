@@ -92,18 +92,9 @@ fn part2(data: &str) -> u64 {
                     Ok(s) => {
                         let box_number = hash(s.label.as_str());
                         let v = hmap.get_mut(&box_number).unwrap();
-                        let q: Vec<_> = v
-                            .iter()
-                            .enumerate()
-                            .filter(|(_i, x)| x.label == s.label)
-                            .map(|(i, _)| i)
-                            .take(1)
-                            .collect();
-
-                        if q.is_empty() {
-                            v.push(s);
-                        } else {
-                            let _old = std::mem::replace(&mut v[q[0]], s);
+                        match v.iter().position(|l| l.label == s.label) {
+                            None => { v.push(s)},
+                            Some(i) => { v[i] = s;},
                         }
                     }
                     Err(e) => {
